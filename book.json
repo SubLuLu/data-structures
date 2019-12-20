@@ -1,0 +1,15 @@
+{
+	"gitbook": "2.x",
+	"title": "数据结构&算法分析(In Golang)",
+	"description": "<数据结构&算法分析(In Golang)>PDF版",
+	"author":"SubLuLu",
+	"language": "zh-hans",
+	"structure": {
+		"readme": "README.md"
+	},
+	"plugins": [
+		"katex",
+		"-search",
+    "-lunr"
+	]
+}
