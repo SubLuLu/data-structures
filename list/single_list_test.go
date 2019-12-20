@@ -7,7 +7,7 @@ import (
 
 // 单链表测试
 
-var sl = NewSingleCycleList()
+var sl = NewSingleList()
 
 func TestSingleList_Append(t *testing.T) {
 	fmt.Println(t.Name())
