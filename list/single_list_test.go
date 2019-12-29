@@ -9,6 +9,15 @@ import (
 
 var sl = NewSingleList()
 
+func TestSingleList_Add(t *testing.T) {
+	fmt.Println(t.Name())
+
+	err := sl.Add(15)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestSingleList_Append(t *testing.T) {
 	fmt.Println(t.Name())
 

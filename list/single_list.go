@@ -123,15 +123,19 @@ func (sl *singleList) Delete(index int) (int, error) {
 	}
 	// 找到前驱结点，prev.next是index位置的结点
 	prev := sl.findPrevNode(index)
-	val := prev.next.data // 取出index位置结点的元素值
+	val := prev.next.data     // 取出index位置结点的元素值
 	if prev.next == sl.tail { // 如果删除的是最后一个结点
 		// 直接将index位置的前一个结点的next赋值nil
 		prev.next = nil
 		// 尾指针指向最后一个结点
 		sl.tail = prev
 	} else { // 如果删除的不是最后一个结点
+		// 需要删除的结点
+		current := prev.next
 		// 把index位置的前一个结点的next指向index位置的后一个结点
-		prev.next = prev.next.next
+		prev.next = current.next
+		// 断开删除结点的指针域
+		current.next = nil
 	}
 	// 链表size减少
 	sl.size--
