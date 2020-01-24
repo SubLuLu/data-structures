@@ -16,6 +16,7 @@
 | queue  | queue分支，队列实现相关代码    |
 | stack  | stack分支，栈实现相关代码      |
 | hash   | hash分支，散列实现相关代码     |
+| tree   | tree分支，树实现相关代码       |
 
 ### 如何导出电子书
 
