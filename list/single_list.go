@@ -2,6 +2,7 @@ package list
 
 import (
 	"errors"
+	"sync"
 )
 
 // 单链表
@@ -14,9 +15,10 @@ type (
 
 	// 单链表
 	singleList struct {
-		size int         // 单链表中结点元素个数
-		head *singleNode // 单链表中的头指针
-		tail *singleNode // 单链表中的尾指针
+		mu   sync.RWMutex // 读写锁
+		size int          // 单链表中结点元素个数
+		head *singleNode  // 单链表中的头指针
+		tail *singleNode  // 单链表中的尾指针
 	}
 )
 
@@ -28,6 +30,10 @@ func (sl *singleList) Add(val int) error {
 	node := &singleNode{
 		data: val,
 	}
+
+	sl.mu.Lock()
+	defer sl.mu.Unlock()
+
 	// 确定首结点
 	first := sl.head.next
 	// 直接插入到头结点后面
@@ -53,6 +59,10 @@ func (sl *singleList) Append(val int) error {
 	node := &singleNode{
 		data: val,
 	}
+
+	sl.mu.Lock()
+	defer sl.mu.Unlock()
+
 	// 如果尾指针为空，从头开始插入
 	if sl.tail == nil {
 		// 头结点指针域指向新结点
@@ -72,6 +82,9 @@ func (sl *singleList) Append(val int) error {
 // 因为单链表的操作，需要借助前驱结点
 // 所以提供一个查找指定位置结点的前驱结点的方法
 func (sl *singleList) findPrevNode(index int) *singleNode {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
 	// index无效，返回空
 	if index > sl.size || index < 0 {
 		return nil
@@ -89,12 +102,16 @@ func (sl *singleList) findPrevNode(index int) *singleNode {
 // Insert 在单链表指定位置插入新的结点
 // index 指定的位置，从0开始
 func (sl *singleList) Insert(val, index int) error {
+	sl.mu.RLock()
+	size := sl.size
+	sl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index > sl.size || index < 0 {
+	if index > size || index < 0 {
 		return errors.New("insert fail, index out of range")
 	}
 	// 在最后添加，直接调用Append方法
-	if index == sl.size {
+	if index == size {
 		return sl.Append(val)
 	}
 
@@ -105,6 +122,10 @@ func (sl *singleList) Insert(val, index int) error {
 	node := &singleNode{
 		data: val,
 	}
+
+	sl.mu.Lock()
+	defer sl.mu.Unlock()
+
 	// 新结点的next指向index位置的结点
 	node.next = prev.next
 	// index位置前面结点的next指向新结点
@@ -117,12 +138,20 @@ func (sl *singleList) Insert(val, index int) error {
 // Delete 删除指定位置的元素结点，并返回被删除的元素值
 // index 指定的位置，从0开始
 func (sl *singleList) Delete(index int) (int, error) {
+	sl.mu.RLock()
+	size := sl.size
+	sl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= sl.size || index < 0 {
+	if index >= size || index < 0 {
 		return 0, errors.New("delete fail, index out of range")
 	}
 	// 找到前驱结点，prev.next是index位置的结点
 	prev := sl.findPrevNode(index)
+
+	sl.mu.Lock()
+	defer sl.mu.Unlock()
+
 	val := prev.next.data     // 取出index位置结点的元素值
 	if prev.next == sl.tail { // 如果删除的是最后一个结点
 		// 直接将index位置的前一个结点的next赋值nil
@@ -145,20 +174,30 @@ func (sl *singleList) Delete(index int) (int, error) {
 // Set 给指定位置的元素重新赋值
 // index 指定的位置，从0开始
 func (sl *singleList) Set(val, index int) error {
+	sl.mu.RLock()
+	size := sl.size
+	sl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= sl.size || index < 0 {
+	if index >= size || index < 0 {
 		return errors.New("set fail, index out of range")
 	}
 	// 找到index位置的结点
 	current := sl.findPrevNode(index).next
+	sl.mu.Lock()
 	// 重新赋值
 	current.data = val
+	sl.mu.Unlock()
+
 	return nil
 }
 
 // Find 查找指定位置结点的元素值
 // index 指定的位置，从0开始
 func (sl *singleList) Find(index int) (int, error) {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
 	// index超出范围，返回错误
 	if index >= sl.size || index < 0 {
 		return 0, errors.New("find fail, index out of range")
@@ -170,6 +209,9 @@ func (sl *singleList) Find(index int) (int, error) {
 
 // Traverse 遍历单链表，以切片形式返回
 func (sl *singleList) Traverse() []int {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
 	// 指定[]int的大小，避免频繁分配内存
 	res := make([]int, sl.size)
 	t := sl.head
@@ -182,8 +224,12 @@ func (sl *singleList) Traverse() []int {
 
 // Length 返回单链表的长度(结点元素个数)
 func (sl *singleList) Length() int {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
 	// 1. 通过size返回
 	return sl.size
+
 	// 2. 通过遍历链表计算
 	// var length int
 	// temp := sl.head
@@ -195,10 +241,15 @@ func (sl *singleList) Length() int {
 
 // IsEmpty 判断单链表是否为空
 func (sl *singleList) IsEmpty() bool {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
 	// 1. 通过size进行判断
 	// return sl.size == 0
+
 	// 2. 通过head进行判断
 	return sl.head.next == nil
+
 	// 3. 通过tail进行判断
 	// return sl.tail == nil
 }

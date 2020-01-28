@@ -6,7 +6,6 @@ import (
 )
 
 // 单链表测试
-
 var sl = NewSingleList()
 
 func TestSingleList_Add(t *testing.T) {

@@ -6,7 +6,6 @@ import (
 )
 
 // 单向循环链表测试
-
 var scl = NewSingleCycleList()
 
 func TestSingleCycleList_Add(t *testing.T) {

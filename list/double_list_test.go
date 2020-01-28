@@ -6,7 +6,6 @@ import (
 )
 
 // 双链表测试
-
 var dl = NewDoubleList()
 
 func TestDoubleList_Add(t *testing.T) {

@@ -2,6 +2,7 @@ package list
 
 import (
 	"errors"
+	"sync"
 )
 
 // 双向循环链表
@@ -15,6 +16,7 @@ type (
 
 	// 双向循环链表
 	doubleCycleList struct {
+		mu   sync.RWMutex     // 读写锁
 		size int              // 结点元素个数
 		head *doubleCycleNode // 头指针
 	}
@@ -28,6 +30,10 @@ func (dcl *doubleCycleList) Add(val int) error {
 	node := &doubleCycleNode{
 		data: val,
 	}
+
+	dcl.mu.Lock()
+	defer dcl.mu.Unlock()
+
 	// 确定首结点
 	first := dcl.head.next
 	// 直接插入到头结点后面
@@ -51,6 +57,10 @@ func (dcl *doubleCycleList) Append(val int) error {
 	node := &doubleCycleNode{
 		data: val,
 	}
+
+	dcl.mu.Lock()
+	defer dcl.mu.Unlock()
+
 	tail := dcl.head.prior // 尾指针
 	// 尾结点的后继指针域指向新结点
 	tail.next = node
@@ -69,6 +79,9 @@ func (dcl *doubleCycleList) Append(val int) error {
 // 因为双向循环链表对结点的操作可以通过自身完成
 // 所以提供一个查找指定位置结点方法
 func (dcl *doubleCycleList) findNode(index int) *doubleCycleNode {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	// index无效，返回空
 	if index > dcl.size || index < 0 {
 		return nil
@@ -86,16 +99,24 @@ func (dcl *doubleCycleList) findNode(index int) *doubleCycleNode {
 // Insert 在双向链表指定位置插入新的结点
 // index 指定的位置，从0开始
 func (dcl *doubleCycleList) Insert(val, index int) error {
+	dcl.mu.RLock()
+	size := dcl.size
+	dcl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index > dcl.size || index < 0 {
+	if index > size || index < 0 {
 		return errors.New("insert fail, index out of range")
 	}
 	// 在最后添加，直接调用Append方法
-	if index == dcl.size {
+	if index == size {
 		return dcl.Append(val)
 	}
 	// 找到index位置的结点
 	current := dcl.findNode(index)
+
+	dcl.mu.Lock()
+	defer dcl.mu.Unlock()
+
 	// 构建新结点
 	node := &doubleCycleNode{
 		data: val,
@@ -116,8 +137,12 @@ func (dcl *doubleCycleList) Insert(val, index int) error {
 // Delete 删除指定位置的元素结点，并返回被删除的元素值
 // index 指定的位置，从0开始
 func (dcl *doubleCycleList) Delete(index int) (int, error) {
+	dcl.mu.RLock()
+	size := dcl.size
+	dcl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= dcl.size || index < 0 {
+	if index >= size || index < 0 {
 		return 0, errors.New("delete fail, index out of range")
 	}
 	// 待删除结点
@@ -127,6 +152,9 @@ func (dcl *doubleCycleList) Delete(index int) (int, error) {
 
 // DeleteSelf 删除指定的结点，并返回被删除的元素值
 func (dcl *doubleCycleList) DeleteSelf(node *doubleCycleNode) (int, error) {
+	dcl.mu.Lock()
+	defer dcl.mu.Unlock()
+
 	// 前驱结点或后继结点为空，则不在双向循环链表中
 	if node.prior == nil || node.next == nil {
 		return 0, errors.New("delete self fail, illegal node")
@@ -147,12 +175,18 @@ func (dcl *doubleCycleList) DeleteSelf(node *doubleCycleNode) (int, error) {
 // Set 给指定位置的元素重新赋值
 // index 指定的位置，从0开始
 func (dcl *doubleCycleList) Set(val, index int) error {
+	dcl.mu.RLock()
+	size := dcl.size
+	dcl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= dcl.size || index < 0 {
+	if index >= size || index < 0 {
 		return errors.New("set fail, index out of range")
 	}
 	// 待修改的结点
 	current := dcl.findNode(index)
+	dcl.mu.Lock()
+	defer dcl.mu.Unlock()
 	current.data = val // 重新赋值
 	return nil
 }
@@ -160,6 +194,9 @@ func (dcl *doubleCycleList) Set(val, index int) error {
 // Find 查找指定位置结点的元素值
 // index 指定的位置，从0开始
 func (dcl *doubleCycleList) Find(index int) (int, error) {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	// index超出范围，返回错误
 	if index >= dcl.size || index < 0 {
 		return 0, errors.New("find fail, index out of range")
@@ -170,6 +207,9 @@ func (dcl *doubleCycleList) Find(index int) (int, error) {
 
 // Traverse 遍历双向链表，以切片形式返回
 func (dcl *doubleCycleList) Traverse() []int {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	res := make([]int, dcl.size)
 	t := dcl.head
 	for i := 0; t.next != dcl.head; i++ {
@@ -181,6 +221,9 @@ func (dcl *doubleCycleList) Traverse() []int {
 
 // Reverse 逆向遍历双向循环链表，以切片形式返回
 func (dcl *doubleCycleList) Reverse() []int {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	res := make([]int, dcl.size)
 	t := dcl.head.prior // 尾指针
 	for i := 0; t != dcl.head; i++ {
@@ -193,6 +236,9 @@ func (dcl *doubleCycleList) Reverse() []int {
 // Cycle 循环遍历双向循环链表，以切片形式返回
 // num 为循环遍历圈数
 func (dcl *doubleCycleList) Cycle(num int) []int {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	total := dcl.size * num
 	res := make([]int, total)
 	t := dcl.head
@@ -208,8 +254,12 @@ func (dcl *doubleCycleList) Cycle(num int) []int {
 
 // Length 返回双向链表的长度(结点元素个数)
 func (dcl *doubleCycleList) Length() int {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	// 1. 通过size返回
 	return dcl.size
+
 	// 2. 通过遍历链表计算
 	// var length int
 	// temp := dcl.head
@@ -221,6 +271,9 @@ func (dcl *doubleCycleList) Length() int {
 
 // IsEmpty 判断双向链表是否为空
 func (dcl *doubleCycleList) IsEmpty() bool {
+	dcl.mu.RLock()
+	defer dcl.mu.RUnlock()
+
 	// 1. 通过size进行判断
 	// return dcl.size == 0
 	// 2. 通过head进行判断
@@ -230,7 +283,7 @@ func (dcl *doubleCycleList) IsEmpty() bool {
 // NewDoubleCycleList 创建一个双向循环链表，返回其指针
 func NewDoubleCycleList() *doubleCycleList {
 	node := &doubleCycleNode{}
-	node.next = node // 后继指针域指向自身
+	node.next = node  // 后继指针域指向自身
 	node.prior = node // 前驱指针域指向自身
 	return &doubleCycleList{
 		head: node,

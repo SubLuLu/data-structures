@@ -6,7 +6,6 @@ import (
 )
 
 // 双向循环链表测试
-
 var dcl = NewDoubleCycleList()
 
 func TestDoubleCycleList_Add(t *testing.T) {

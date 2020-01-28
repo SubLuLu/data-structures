@@ -2,6 +2,7 @@ package list
 
 import (
 	"errors"
+	"sync"
 )
 
 // 双链表
@@ -15,9 +16,10 @@ type (
 
 	// 双向链表
 	doubleList struct {
-		size int         // 双链表中结点元素个数
-		head *doubleNode // 双链表中的头指针
-		tail *doubleNode // 双链表中的尾指针
+		mu   sync.RWMutex // 读写锁
+		size int          // 双链表中结点元素个数
+		head *doubleNode  // 双链表中的头指针
+		tail *doubleNode  // 双链表中的尾指针
 	}
 )
 
@@ -29,6 +31,10 @@ func (dl *doubleList) Add(val int) error {
 	node := &doubleNode{
 		data: val,
 	}
+
+	dl.mu.Lock()
+	defer dl.mu.Unlock()
+
 	// 确定首结点
 	first := dl.head.next
 	// 直接插入到头结点后面
@@ -58,6 +64,10 @@ func (dl *doubleList) Append(val int) error {
 	node := &doubleNode{
 		data: val,
 	}
+
+	dl.mu.Lock()
+	defer dl.mu.Unlock()
+
 	// 如果尾指针为空，从头开始插入
 	if dl.tail == nil {
 		// 头结点后继指针域指向新结点
@@ -81,6 +91,9 @@ func (dl *doubleList) Append(val int) error {
 // 因为双链表对结点的操作可以通过自身完成
 // 所以提供一个查找指定位置结点方法
 func (dl *doubleList) findNode(index int) *doubleNode {
+	dl.mu.RLock()
+	defer dl.mu.RUnlock()
+
 	// index无效，返回空
 	if index > dl.size || index < 0 {
 		return nil
@@ -98,12 +111,16 @@ func (dl *doubleList) findNode(index int) *doubleNode {
 // Insert 在双向链表指定位置插入新的结点
 // index 指定的位置，从0开始
 func (dl *doubleList) Insert(val, index int) error {
+	dl.mu.RLock()
+	size := dl.size
+	dl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index > dl.size || index < 0 {
+	if index > size || index < 0 {
 		return errors.New("insert fail, index out of range")
 	}
 	// 在最后添加，直接调用Append方法
-	if index == dl.size {
+	if index == size {
 		return dl.Append(val)
 	}
 	// 待插入位置的结点
@@ -112,6 +129,10 @@ func (dl *doubleList) Insert(val, index int) error {
 	node := &doubleNode{
 		data: val,
 	}
+
+	dl.mu.Lock()
+	defer dl.mu.Unlock()
+
 	// 新结点的后继指针域指向原来index位置的结点
 	node.next = current
 	// 新结点的前驱指针域指向原来index-1位置的结点
@@ -128,8 +149,12 @@ func (dl *doubleList) Insert(val, index int) error {
 // Delete 删除指定位置的元素结点，并返回被删除的元素值
 // index 指定的位置，从0开始
 func (dl *doubleList) Delete(index int) (int, error) {
+	dl.mu.RLock()
+	size := dl.size
+	dl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= dl.size || index < 0 {
+	if index >= size || index < 0 {
 		return 0, errors.New("delete fail, index out of range")
 	}
 	// 待删除结点
@@ -139,6 +164,9 @@ func (dl *doubleList) Delete(index int) (int, error) {
 
 // DeleteSelf 删除指定的结点，并返回被删除的元素值
 func (dl *doubleList) DeleteSelf(node *doubleNode) (int, error) {
+	dl.mu.Lock()
+	defer dl.mu.Unlock()
+
 	// 前驱结点为空，则不在双向链表中
 	if node.prior == nil {
 		return 0, errors.New("delete self fail, illegal node")
@@ -171,19 +199,29 @@ func (dl *doubleList) DeleteSelf(node *doubleNode) (int, error) {
 // Set 给指定位置的元素重新赋值
 // index 指定的位置，从0开始
 func (dl *doubleList) Set(val, index int) error {
+	dl.mu.RLock()
+	size := dl.size
+	dl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= dl.size || index < 0 {
+	if index >= size || index < 0 {
 		return errors.New("set fail, index out of range")
 	}
 	// 待修改的结点
 	current := dl.findNode(index)
+
+	dl.mu.Lock()
 	current.data = val // 重新赋值
+	dl.mu.Unlock()
 	return nil
 }
 
 // Find 查找指定位置结点的元素值
 // index 指定的位置，从0开始
 func (dl *doubleList) Find(index int) (int, error) {
+	dl.mu.RLock()
+	defer dl.mu.RUnlock()
+
 	// index超出范围，返回错误
 	if index >= dl.size || index < 0 {
 		return 0, errors.New("find fail, index out of range")
@@ -194,6 +232,9 @@ func (dl *doubleList) Find(index int) (int, error) {
 
 // Traverse 遍历双向链表，以切片形式返回
 func (dl *doubleList) Traverse() []int {
+	dl.mu.RLock()
+	defer dl.mu.RUnlock()
+
 	res := make([]int, dl.size)
 	t := dl.head
 	for i := 0; t.next != nil; i++ {
@@ -205,6 +246,9 @@ func (dl *doubleList) Traverse() []int {
 
 // Reverse 逆向遍历双向链表，以切片形式返回
 func (dl *doubleList) Reverse() []int {
+	dl.mu.RLock()
+	defer dl.mu.RUnlock()
+
 	res := make([]int, dl.size)
 	t := dl.tail
 	for i := 0; t != dl.head; i++ {
@@ -216,8 +260,12 @@ func (dl *doubleList) Reverse() []int {
 
 // Length 返回双向链表的长度(结点元素个数)
 func (dl *doubleList) Length() int {
+	dl.mu.RLock()
+	defer dl.mu.RUnlock()
+
 	// 1. 通过size返回
 	return dl.size
+
 	// 2. 通过遍历链表计算
 	// var length int
 	// temp := dl.head
@@ -229,6 +277,9 @@ func (dl *doubleList) Length() int {
 
 // IsEmpty 判断双向链表是否为空
 func (dl *doubleList) IsEmpty() bool {
+	dl.mu.RLock()
+	defer dl.mu.RUnlock()
+
 	// 1. 通过size进行判断
 	// return dl.size == 0
 	// 2. 通过head进行判断

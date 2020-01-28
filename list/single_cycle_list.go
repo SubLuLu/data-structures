@@ -2,6 +2,7 @@ package list
 
 import (
 	"errors"
+	"sync"
 )
 
 // 单向循环链表
@@ -14,6 +15,7 @@ type (
 
 	// 单向循环链表
 	singleCycleList struct {
+		mu   sync.RWMutex     // 读写锁
 		size int              // 结点元素个数
 		head *singleCycleNode // 头指针
 		tail *singleCycleNode // 尾指针
@@ -28,6 +30,10 @@ func (scl *singleCycleList) Add(val int) error {
 	node := &singleCycleNode{
 		data: val,
 	}
+
+	scl.mu.Lock()
+	defer scl.mu.Unlock()
+
 	// 确定首结点
 	first := scl.head.next
 	// 直接插入到头结点后面
@@ -55,6 +61,10 @@ func (scl *singleCycleList) Append(val int) error {
 	node := &singleCycleNode{
 		data: val,
 	}
+
+	scl.mu.Lock()
+	defer scl.mu.Unlock()
+
 	// 如果尾指针为空，从头开始插入
 	if scl.tail == nil {
 		// 头结点指针域指向新结点
@@ -76,6 +86,9 @@ func (scl *singleCycleList) Append(val int) error {
 // 因为单向循环链表的操作，需要借助前驱结点
 // 所以提供一个查找指定位置结点的前驱结点的方法
 func (scl *singleCycleList) findPrevNode(index int) *singleCycleNode {
+	scl.mu.RLock()
+	defer scl.mu.RUnlock()
+
 	// index无效，返回空
 	if index > scl.size || index < 0 {
 		return nil
@@ -93,12 +106,16 @@ func (scl *singleCycleList) findPrevNode(index int) *singleCycleNode {
 // Insert 在单向循环链表指定位置插入新的结点
 // index 指定的位置，从0开始
 func (scl *singleCycleList) Insert(val, index int) error {
+	scl.mu.RLock()
+	size := scl.size
+	scl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index > scl.size || index < 0 {
+	if index > size || index < 0 {
 		return errors.New("insert fail, index out of range")
 	}
 	// 在最后添加，直接调用Append方法
-	if index == scl.size {
+	if index == size {
 		return scl.Append(val)
 	}
 	// 查找前驱结点
@@ -107,6 +124,10 @@ func (scl *singleCycleList) Insert(val, index int) error {
 	node := &singleCycleNode{
 		data: val,
 	}
+
+	scl.mu.Lock()
+	defer scl.mu.Unlock()
+
 	// 新结点的next指向index位置的结点
 	node.next = prev.next
 	// index位置前面结点的next指向新结点
@@ -119,16 +140,24 @@ func (scl *singleCycleList) Insert(val, index int) error {
 // Delete 删除指定位置的元素结点，并返回被删除的元素值
 // index 指定的位置，从0开始
 func (scl *singleCycleList) Delete(index int) (int, error) {
+	scl.mu.RLock()
+	size := scl.size
+	scl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= scl.size || index < 0 {
+	if index >= size || index < 0 {
 		return 0, errors.New("delete fail, index out of range")
 	}
 	// 存储需要返回的值和计数器
 	var val int
 	// 查找前驱结点
 	prev := scl.findPrevNode(index)
+
+	scl.mu.Lock()
+	defer scl.mu.Unlock()
+
 	current := prev.next // 需要删除的结点
-	val = current.data // 取出index位置结点的元素值
+	val = current.data   // 取出index位置结点的元素值
 	// 把index位置的前一个结点的next指向index位置的后一个结点
 	prev.next = current.next
 	// 断开删除结点的指针域
@@ -141,20 +170,30 @@ func (scl *singleCycleList) Delete(index int) (int, error) {
 // Set 给指定位置的元素重新赋值
 // index 指定的位置，从0开始
 func (scl *singleCycleList) Set(val, index int) error {
+	scl.mu.RLock()
+	size := scl.size
+	scl.mu.RUnlock()
+
 	// index超出范围，返回错误
-	if index >= scl.size || index < 0 {
+	if index >= size || index < 0 {
 		return errors.New("set fail, index out of range")
 	}
 	// 找到index位置的结点
 	current := scl.findPrevNode(index).next
+	scl.mu.Lock()
 	// 重新赋值
 	current.data = val
+	scl.mu.Unlock()
 	return nil
 }
 
 // Find 查找指定位置结点的元素值
 // index 指定的位置，从0开始
 func (scl *singleCycleList) Find(index int) (int, error) {
+	// 读锁可以多重锁
+	scl.mu.RLock()
+	defer scl.mu.RUnlock()
+
 	// index超出范围，返回错误
 	if index >= scl.size || index < 0 {
 		return 0, errors.New("find fail, index out of range")
@@ -166,6 +205,9 @@ func (scl *singleCycleList) Find(index int) (int, error) {
 
 // Traverse 遍历单向循环链表，以切片形式返回
 func (scl *singleCycleList) Traverse() []int {
+	scl.mu.RLock()
+	defer scl.mu.RUnlock()
+
 	res := make([]int, scl.size)
 	t := scl.head
 	for i := 0; t.next != scl.head; i++ {
@@ -178,6 +220,9 @@ func (scl *singleCycleList) Traverse() []int {
 // Cycle 循环遍历单向循环链表，以切片形式返回
 // num 为循环遍历圈数
 func (scl *singleCycleList) Cycle(num int) []int {
+	scl.mu.RLock()
+	defer scl.mu.RUnlock()
+
 	total := scl.size * num
 	res := make([]int, total)
 	t := scl.head
@@ -193,8 +238,12 @@ func (scl *singleCycleList) Cycle(num int) []int {
 
 // Length 返回单向循环链表的长度(结点元素个数)
 func (scl *singleCycleList) Length() int {
+	scl.mu.RLock()
+	defer scl.mu.RUnlock()
+
 	// 1. 通过size返回
 	return scl.size
+
 	// 2. 通过遍历链表计算
 	// var length int
 	// temp := scl.head
@@ -206,10 +255,15 @@ func (scl *singleCycleList) Length() int {
 
 // IsEmpty 判断单向循环链表是否为空
 func (scl *singleCycleList) IsEmpty() bool {
+	scl.mu.RLock()
+	defer scl.mu.RUnlock()
+
 	// 1. 通过size进行判断
 	// return scl.size == 0
+
 	// 2. 通过head进行判断
 	return scl.head.next == scl.head
+
 	// 3. 通过tail进行判断
 	// return sl.tail == nil
 }
