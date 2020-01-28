@@ -11,7 +11,7 @@ package tree
 // 即把一般二叉树转换为完全二叉树时，不存在的结点值设置为空
 type arrayBinary []*int
 
-// 前序遍历
+// 顺序存储的二叉树前序遍历——递归实现
 func (ab arrayBinary) PreOrder() []int {
 	n := len(ab)
 	if n == 0 { // 空树，直接返回
@@ -60,7 +60,7 @@ func pre(data arrayBinary, result []int, root int, pos func() int) {
 	pre(data, result, 2*root+2, pos)
 }
 
-// 中序遍历
+// 顺序存储的二叉树中序遍历——递归实现
 func (ab arrayBinary) InOrder() []int {
 	n := len(ab)
 	if n == 0 { // 空树，直接返回
@@ -108,7 +108,7 @@ func in(data arrayBinary, result []int, root int, pos func() int) {
 	in(data, result, 2*root+2, pos)
 }
 
-// 后续遍历
+// 顺序存储的二叉树后续遍历——递归实现
 func (ab arrayBinary) PostOrder() []int {
 	n := len(ab)
 	if n == 0 { // 空树，直接返回
@@ -189,7 +189,7 @@ type listBinary struct {
 	right *listBinary // 右孩子
 }
 
-// 前序遍历
+// 链式存储的二叉树前序遍历——递归实现
 func (lb *listBinary) PreOrder() *list {
 	l := newList()
 	preOrder(lb, l)
@@ -206,7 +206,7 @@ func preOrder(node *listBinary, l *list) {
 	preOrder(node.right, l)
 }
 
-// 中序遍历
+// 链式存储的二叉树中序遍历——递归实现
 func (lb *listBinary) InOrder() *list {
 	l := newList()
 	inOrder(lb, l)
@@ -223,7 +223,7 @@ func inOrder(node *listBinary, l *list) {
 	inOrder(node.right, l)
 }
 
-// 后序遍历
+// 链式存储的二叉树后序遍历——递归实现
 func (lb *listBinary) PostOrder() *list {
 	l := newList()
 	postOrder(lb, l)

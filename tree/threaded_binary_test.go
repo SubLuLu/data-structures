@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+// 线索化二叉树测试
+
 func TestThreadedBinary_PreThreading(t *testing.T) {
 	fmt.Println(t.Name())
 	tb := newThreadedBinary()

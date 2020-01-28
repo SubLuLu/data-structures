@@ -10,7 +10,7 @@ package tree
 // 因此，要将根的顺序临时存储
 // 而关于逆序输出最有效的数据就结构就是栈
 
-// 顺序存储二叉树前序遍历的非递归实现
+// 顺序存储的二叉树前序遍历——非递归实现
 func (ab arrayBinary) PreOrderTraverse() []int {
 	n := len(ab)
 	if n == 0 { // 空树，直接返回
@@ -65,7 +65,7 @@ func (ab arrayBinary) PreOrderTraverse() []int {
 	return result
 }
 
-// 顺序存储二叉树中序遍历的非递归实现
+// 顺序存储二叉树的中序遍历——非递归实现
 func (ab arrayBinary) InOrderTraverse() []int {
 	n := len(ab)
 	if n == 0 { // 空树，直接返回
@@ -125,7 +125,7 @@ func (ab arrayBinary) InOrderTraverse() []int {
 	return result
 }
 
-// 顺序存储二叉树后序遍历的非递归实现
+// 顺序存储的二叉树后序遍历——非递归实现
 func (ab arrayBinary) PostOrderTraverse() []int {
 	n := len(ab)
 	if n == 0 { // 空树，直接返回
@@ -225,7 +225,7 @@ func (ab arrayBinary) LevelOrderTraverse() []int {
 	return result
 }
 
-// 链式存储二叉树的非递归前序遍历
+// 链式存储的二叉树的前序遍历——非递归实现
 // lb本质上是二叉树的根结点
 func (lb *listBinary) PreOrderTraverse() *list {
 	// 存放遍历结果的链表
@@ -266,7 +266,7 @@ func (lb *listBinary) PreOrderTraverse() *list {
 	return l
 }
 
-// 链式存储二叉树的非递归中序遍历
+// 链式存储的二叉树中序遍历——非递归实现
 // lb本质上是二叉树的根结点
 func (lb *listBinary) InOrderTraverse() *list {
 	// 存放遍历结果的链表
@@ -309,7 +309,7 @@ func (lb *listBinary) InOrderTraverse() *list {
 	return l
 }
 
-// 链式存储二叉树的非递归后序遍历
+// 链式存储的二叉树后序遍历——非递归实现
 // lb本质上是二叉树的根结点
 func (lb *listBinary) PostOrderTraverse() *list {
 	// 存放遍历结果的链表
@@ -366,7 +366,7 @@ func (lb *listBinary) PostOrderTraverse() *list {
 	return l
 }
 
-// 链式存储二叉树层级遍历
+// 链式存储的二叉树层级遍历
 // 链式存储结构遍历某一层时需要知道该层所有结点的双亲结点及其顺序
 // 所以需要用队列进行存储双亲结点
 func (lb *listBinary) LevelOrderTraverse() *list {

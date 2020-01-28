@@ -90,8 +90,10 @@ func NewHuffman(weights []int) *huffman {
 	for i, weight := range weights {
 		hns[i] = LeafHuffmanNode(weight)
 	}
+
 	// 对huffmanNodes进行排序
 	sort.Sort(hns)
+	
 	var root *huffmanNode
 	for len(hns) > 1 { // 当切片中的结点只剩下一个时，即为哈夫曼树的根结点
 		// 取前两个结点构造二叉树

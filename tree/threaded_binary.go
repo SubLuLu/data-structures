@@ -12,7 +12,7 @@ type threadedBinary struct {
 	head *threadedNode // 头结点
 }
 
-// 前序线索化
+// 前序线索化——递归实现
 // 将为空的左孩子结点指向前驱结点(双亲结点)
 // 将为空的右孩子结点指向后继结点
 func (tb *threadedBinary) PreThreading() {
@@ -93,7 +93,7 @@ func (tb *threadedBinary) PreThreadedTraverse() *list {
 	return l
 }
 
-// 中序线索化
+// 中序线索化——递归实现
 // 将为空的左孩子结点指向前驱结点
 // 将为空的右孩子结点指向后继结点
 func (tb *threadedBinary) InThreading() {
@@ -168,7 +168,7 @@ func (tb *threadedBinary) InThreadedTraverse() *list {
 	return l
 }
 
-// 后序线索化
+// 后序线索化——递归实现
 // 将为空的左孩子结点指向前驱结点
 // 将为空的右孩子结点指向后继结点
 func (tb *threadedBinary) PostThreading() {

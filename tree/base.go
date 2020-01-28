@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// 简单链表，供遍历使用
 type (
 	listNode struct {
 		data int
@@ -56,6 +57,7 @@ func newList() *list {
 	}
 }
 
+// 链式栈，供非递归遍历使用
 type (
 	// 链表结点
 	linkListNode struct {
@@ -178,7 +180,7 @@ func NewNodeStack() *nodeStack {
 	}
 }
 
-// 简易链表结构队列
+// 简易链表结构队列，供分层遍历使用
 type (
 	// 链表结点
 	queueNode struct {

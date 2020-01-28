@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+// Huffman树的构造测试
+
 func TestHuffman_PreOrder(t *testing.T) {
 	weights := []int{5, 29, 7, 8, 14, 23, 3, 11}
 	tree := NewHuffman(weights)
