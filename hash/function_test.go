@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+// 测试散列算法
+
 type bornNum struct {
 	Year int // 年份
 	Num  int // 人数

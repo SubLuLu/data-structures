@@ -19,7 +19,9 @@ func Identity(key Key, a, b int) (code int, err error) {
 		err = errors.New("a can't be zero")
 		return
 	}
+
 	var hc int
+
 	switch key.(type) {
 	case int:
 		// 如果是int类型，直接类型转换
@@ -43,7 +45,9 @@ func Division(key Key, p int) (code int, err error) {
 		err = errors.New("p can't be zero")
 		return
 	}
+
 	var hc int
+
 	switch key.(type) {
 	case int:
 		// 如果是int类型，直接类型转换
@@ -70,7 +74,9 @@ func DigitalAnalysis(key Key, start, end int) (code int, err error) {
 		err = errors.New("end must be bigger than start")
 		return
 	}
+
 	var hc int
+
 	switch key.(type) {
 	case int:
 		// 如果是int类型，直接类型转换
@@ -114,7 +120,9 @@ func MidSquare(key Key, start, end int) (code int, err error) {
 		err = errors.New("end must be bigger than start")
 		return
 	}
+
 	var hc int
+
 	switch key.(type) {
 	case int:
 		// 如果是int类型，直接类型转换
@@ -142,7 +150,9 @@ func Folding(key Key, size int) (code int, err error) {
 		err = errors.New("size must be positive")
 		return
 	}
+
 	var hc int
+	
 	switch key.(type) {
 	case int:
 		// 如果是int类型，直接类型转换

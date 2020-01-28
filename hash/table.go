@@ -10,10 +10,11 @@ import (
 
 // 散列表
 type hashTable struct {
-	// 键值对，key为hash值
-	items map[int]Value
 	// 读写锁
 	lock sync.RWMutex
+	// 键值对，key为hash值
+	items map[int]Value
+
 }
 
 // HashCode 计算key的hash值

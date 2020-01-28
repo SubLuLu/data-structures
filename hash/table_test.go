@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ht = NewHashTable()    // 基础班散列表
+	ht = NewHashTable()    // 基础版散列表
 	st = NewSeniorTable(8) // 高级版散列表
 )
 
