@@ -6,7 +6,6 @@ import (
 )
 
 // 数组实现栈测试
-
 var as = NewArrayStack(5)
 
 func TestArrayStack_Push(t *testing.T) {

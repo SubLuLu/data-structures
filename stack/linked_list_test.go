@@ -6,7 +6,6 @@ import (
 )
 
 // 链式栈测试
-
 var ls = NewLinkListStack()
 
 func TestLinkListStack_Push(t *testing.T) {
