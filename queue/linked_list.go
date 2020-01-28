@@ -2,6 +2,7 @@ package queue
 
 import (
 	"errors"
+	"sync"
 )
 
 type (
@@ -17,6 +18,7 @@ type (
 	// size主要用途是在遍历的时候申请长度为size的切片
 	// 避免使用append函数，导致频繁分配内存
 	linkedListQueue struct {
+		mu   sync.RWMutex    // 读写锁
 		size int             // 队列的当前大小
 		head *linkedListNode // 链表头结点(非首结点)
 		tail *linkedListNode // 链表尾结点
@@ -30,6 +32,10 @@ func (lq *linkedListQueue) Enqueue(num int) error {
 	node := &linkedListNode{
 		data: num,
 	}
+
+	lq.mu.Lock()
+	defer lq.mu.Unlock()
+
 	lq.tail.next = node
 	lq.tail = node
 	lq.size++
@@ -42,6 +48,10 @@ func (lq *linkedListQueue) Dequeue() (int, error) {
 	if lq.IsEmpty() {
 		return 0, errors.New("link list queue is empty")
 	}
+
+	lq.mu.Lock()
+	defer lq.mu.Unlock()
+
 	node := lq.head.next // 链表首结点
 	if node == lq.tail { // 删除最后一个结点
 		lq.tail = lq.head // 尾结点指向头结点
@@ -54,6 +64,9 @@ func (lq *linkedListQueue) Dequeue() (int, error) {
 // IsEmpty 判断队列是否为空
 // 返回值表示队列是否为空 true表示为空
 func (lq *linkedListQueue) IsEmpty() bool {
+	lq.mu.RLock()
+	defer lq.mu.RUnlock()
+
 	// 1. 通过size判断队列是否为空
 	// return lq.size == 0
 
@@ -63,6 +76,9 @@ func (lq *linkedListQueue) IsEmpty() bool {
 
 // Traverse 遍历队列，以切片形式返回
 func (lq *linkedListQueue) Traverse() []int {
+	lq.mu.RLock()
+	defer lq.mu.RUnlock()
+
 	res := make([]int, lq.size)
 	t := lq.head
 	for i := 0; t != lq.tail; i++ {

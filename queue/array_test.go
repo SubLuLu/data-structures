@@ -6,7 +6,6 @@ import (
 )
 
 // 数组实现循环队列测试
-
 var aq = NewArrayQueue(5)
 
 func TestArrayQueue_Enqueue(t *testing.T) {

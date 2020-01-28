@@ -6,7 +6,6 @@ import (
 )
 
 // 链式队列测试
-
 var lq = NewLinkListQueue()
 
 func TestLinkListQueue_Enqueue(t *testing.T) {
