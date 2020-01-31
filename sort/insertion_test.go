@@ -5,10 +5,11 @@ import (
 	"testing"
 )
 
+// 测试直接插入排序
 func TestInsert(t *testing.T) {
 	fmt.Println(t.Name())
 
-	ints := []int{9, 3, 1, 4, 2, 7, 8, 6, 5}
+	ints := []int{8, 9, 1, 7, 2, 3, 5, 4, 6, 0}
 
 	fmt.Println("输入为：", ints)
 

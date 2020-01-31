@@ -4,30 +4,21 @@ package sort
 // 1. 默认起始元素是最小的
 // 2. 每轮循环找到一个最小的
 // 3. 和起始元素进行交换
-func Select(data Sort) {
-	n := data.Len()
+func Selection(data []int) {
+	n := len(data)
 	// 最小值的下标
 	var index int
+	// 起始元素从0开始
 	for i := 0; i < n; i++ {
-		index = i // 每次找寻最小值时初始化起始下标
+		index = i // 每次找寻最小值时初始化为起始下标
 		for j := i; j < n; j++ {
-			if data.Less(j, index) {
+			if data[j] < data[index] {
 				index = j
 			}
 		}
 		// 第一个就是最小值，则不需要交换
 		if index != i {
-			data.Swap(i, index)
+			data[i], data[index] = data[index], data[i]
 		}
 	}
 }
-
-// IntsSelect sorts a slice of ints in increasing order.
-func IntsSelect(a []int) { Select(IntSlice(a)) }
-
-// Float64sSelect sorts a slice of float64s in increasing order
-// (not-a-number values are treated as less than other values).
-func Float64sSelect(a []float64) { Select(Float64Slice(a)) }
-
-// StringsSelect sorts a slice of strings in increasing order.
-func StringsSelect(a []string) { Select(StringSlice(a)) }

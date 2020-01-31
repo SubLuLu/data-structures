@@ -92,7 +92,6 @@ func Radix(data []int64) {
 		// 将每轮排序结果放回data中，最后一轮count不需要清零
 		adjust(data, bins, count, i != digit - 1)
 	}
-
 	// 如果序列中有负数也有非负数，则最后对负数进行一次排序
 	if min < 0 && !isNegative {
 		// 当digit大于等于2时，负数都在右边且有序

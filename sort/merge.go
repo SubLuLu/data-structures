@@ -38,6 +38,8 @@ func mergeSort(data, result []int, left, right int){
 }
 
 // 合并
+// 分解后的序列进行合并
+// 在合并的过程中进行排序
 func merge(data, result []int, left, right int) {
 	// 通过求中间值获得做序列和有序列的边界
 	mid := (right + left) >> 1
@@ -79,6 +81,7 @@ func merge(data, result []int, left, right int) {
 }
 
 // 归并排序go特色版
+//
 // 利用切片的特性，简化了代码量
 // 同时提高了可阅读性
 // 但由于每次合并都是重新申请一个切片

@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// 测试计数排序
 func TestCounting(t *testing.T) {
 	fmt.Println(t.Name())
 

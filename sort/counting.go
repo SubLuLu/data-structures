@@ -11,7 +11,6 @@ func Counting(data []int) {
 	if n <= 1 {
 		return
 	}
-
 	// 计算出最大值与最小值
 	min, max := maxAndMin(data)
 	// 确定计数桶的长度
@@ -25,7 +24,6 @@ func Counting(data []int) {
 		// 计数器自增
 		bins[index] += 1
 	}
-
 	// 填充时的索引
 	var k int
 	// 按顺序填充到原序列

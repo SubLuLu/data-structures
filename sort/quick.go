@@ -6,6 +6,7 @@ package sort
 // 最后就化解成为这三种中的一种
 func Quick(data []int) {
 	n := len(data)
+
 	// 默认取中间的作为基准数
 	QuickBaseMiddle(data, 0, n-1)
 }
