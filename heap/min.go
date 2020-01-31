@@ -236,7 +236,7 @@ func (mh *minHeap) shiftDown(index int) (int, bool) {
 	return index, false
 }
 
-// NewMinHeap 创建一个数据为空的大顶堤
+// NewMinHeap 创建一个数据为空的小顶堤
 func NewMinHeap(size int) *minHeap {
 	return &minHeap{
 		length: 0,
@@ -245,7 +245,7 @@ func NewMinHeap(size int) *minHeap {
 	}
 }
 
-// BuildMinHeap 根据给定的数组创建大顶堆
+// BuildMinHeap 根据给定的数组创建小顶堆
 // 从数组中的第二个元素开始进行Push操作
 func BuildMinHeap(data []int) *minHeap {
 	length := len(data)
